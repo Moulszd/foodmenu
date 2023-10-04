@@ -74,7 +74,7 @@ class CreateItem(LoginRequiredMixin, CreateView):
 
 
 # Create a class-based view called UpdateItem that inherits from UpdateView.
-class UpdateItem(UpdateView):
+class UpdateItem(LoginRequiredMixin, UpdateView):
     model = Item
     form_class = ItemForm
     template_name = 'food/item-form.html'
@@ -88,11 +88,15 @@ class UpdateItem(UpdateView):
         # Get the item based on the 'id' URL parameter.
         return Item.objects.get(id=self.kwargs['id'])
     
+    def handle_no_permission(self):
+        # Redirect to the login page
+        return redirect('users:login')
+    
     
 # -----------------------------------------------------------------------------------
 
 # Create a class-based view called DeleteItem that inherits from DeleteView.
-class DeleteItem(DeleteView):
+class DeleteItem(LoginRequiredMixin, DeleteView):
     model = Item
     template_name = 'food/item_confirm_delete.html'  # Specify the confirmation template
     # Set the name of the context variable that will hold the item object in the template
@@ -107,3 +111,7 @@ class DeleteItem(DeleteView):
     def get_object(self, queryset=None):
         # Get the Item object to be deleted based on the URL parameter (id)
         return Item.objects.get(id=self.kwargs['id'])
+    
+    def handle_no_permission(self):
+        # Redirect to the login page
+        return redirect('users:login')
